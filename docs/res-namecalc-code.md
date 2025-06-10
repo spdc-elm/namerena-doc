@@ -1,100 +1,121 @@
 # 算号代码获取
 
 ```cpp
-typedef unsigned long long u64_t;
-typedef unsigned char u8_t;
-const int N=256;
-const int skill_cnt=40;
-struct Name
-{
-    u8_t val[N],ual[N],val_base[N],val_base2[N];
-    u8_t name_base[M], freq[16], skill[skill_cnt], p, q;
-    int prop[8];
-    int q_len,V,seed;
-    u8_t m()
-    {
-        q += val[++p];
-        swap(val[p], val[q]);
-        return val[val[p] + val[q] & 255];
+struct Rand{
+    unsigned char a,b,c[256];
+    inline Rand(int _a,int _b,unsigned char *_c):a(_a),b(_b){memcpy(c,_c,sizeof(c));}
+    inline unsigned char m(){
+        b+=c[++a];
+        std::swap(c[a],c[b]);
+        return c[(c[a]+c[b])&255];
     }
-    int gen()
-    {
-        int u = m();
-        return (u << 8 | m()) % skill_cnt;
+    inline int operator()(int a){
+        if(!a)
+            return 0;
+        int u=m();
+        return u=(u<<8|m())%a;
     }
-    void load_team(char *_team)
-    {
-        int t_len = strlen(_team)+1;
-        u8_t s;
-        for (int i = 0; i < N; i++) val_base[i] = i;
-        for (int i = s = 0; i < N; ++i)
-        {
-            if (i % t_len)
-                s += _team[i % t_len - 1];
-            s += val_base[i];
-            swap(val_base[i], val_base[s]);
+};
+struct Name{
+    struct Skill{
+        int id,freq;
+        inline void init(int _id){
+            id=_id,freq=0;
+            return;
         }
-    }
-    void load_name(const char *name)
-    {
-        memcpy(val, val_base, sizeof val);
-        q_len = -1;
-        u8_t s;
-        int t_len=strlen(name)+1;
-        for (int _ = 0; _ < 2; _++)
-            for (int i = s = 0; i < N; i++)
-            {
-                if (i % t_len) s += name[i % t_len - 1];
-                s += val[i];
-                swap(val[i], val[s]);
-            }
-        for (int i = 0; i < N; i += 8)
-            ual[i] = val[i] * 181 + 160;
-        for (int i = 0; i < N; i ++)
-            if (ual[i] >= 89 && ual[i] < 217)
-                name_base[++q_len] = ual[i] & 63;
-        prop[1] = median(name_base[10], name_base[11], name_base[12]);
-        prop[2] = median(name_base[13], name_base[14], name_base[15]);
-        prop[3] = median(name_base[16], name_base[17], name_base[18]);
-        prop[4] = median(name_base[19], name_base[20], name_base[21]);
-        prop[5] = median(name_base[22], name_base[23], name_base[24]);
-        prop[6] = median(name_base[25], name_base[26], name_base[27]);
-        prop[7] = median(name_base[28], name_base[29], name_base[30]);
-        sort(name_base, name_base + 10);
-        prop[0] = (154 + name_base[3] + name_base[4] + name_base[5] + name_base[6])/ 3;
-    }
-    void calc_skills(const char *name)
-    {
-        q_len=-1;
-        for (int i = 0; i < N; i += 8)
-            ual[i] = val[i] * 181 + 160;
-        for (int i = 0; i < N; i ++)
-            if (ual[i] >= 89 && ual[i] < 217)
-                name_base[++q_len] = ual[i] & 63;
-
-        u8_t *a = name_base + K;
-        for (int i = 0; i < skill_cnt; i ++) skill[i] = i;
-        memset(freq, 0, sizeof freq);
-        p = q = 0;
-        for (int s = 0, _ = 0; _ < 2; _ ++)
-            for (int i = 0; i < skill_cnt; i ++) {
-                s = (s + gen() + skill[i]) % skill_cnt;
-                swap(skill[i], skill[s]);
-            }
-        int last = -1;
-        for (int i = 0, j = 0; i < K; i += 4, j ++) {
-            u8_t p = min({a[i], a[i + 1], a[i + 2], a[i + 3]});
-            if (p > 10 && skill[j] < 35) {
-                freq[j] = p - 10;
-                if (skill[j] < 25) last = j;
-            }
-            else freq[j] = 0;
+    };
+    Skill nameskill[128];
+    unsigned char val[256],namebase[128],namebonus[128],team[256],name[256];
+    int namelen,teamlen,bonuslen;
+    bool load(char *rawnamein){
+        for(int i=0;i<256;++i)
+            name[i]=team[i]=0;
+        char *namein=cvt(rawnamein);
+        namelen=1,teamlen=1,bonuslen=0;
+        for(int i=0,f=0;namein[i];++i){
+            if(namein[i]=='@')
+                f=1;
+            else if(!f)
+                name[namelen++]=namein[i];
+            else
+                team[teamlen++]=namein[i];
         }
-        if (last != -1) freq[last] <<= 1;
-        if (freq[14] && last != 14)
-            freq[14] += min({name_base[60], name_base[61], freq[14]});
-        if (freq[15] && last != 15)
-            freq[15] += min({name_base[62], name_base[63], freq[15]});
+        if(namelen==1||teamlen==1)
+            return false;
+        unsigned char s;
+        for(int i=0;i<256;++i)
+            val[i]=i;
+        for(int i=s=0;i<256;++i){
+            s+=team[i%teamlen]+val[i];
+            std::swap(val[i],val[s]);
+        }
+        for(int i=0;i<2;++i){
+            for(int j=s=0;j<256;++j){
+                s+=name[j%namelen]+val[j];
+                std::swap(val[j],val[s]);
+            }
+        }
+        for(int i=0;i<256;++i){
+            unsigned char m=val[i]*181+160;
+            if(m>=89&&m<217)
+                namebase[bonuslen++]=m&63;
+        }
+        memcpy(namebonus,namebase,sizeof(namebase));
+        return true;
+    }
+    void calcprops(int *propbonus){
+        int propcnt=0;
+        unsigned char r[32];
+        memcpy(r,namebonus,sizeof(r));
+        for(int i=10;i<31;i+=3){
+            std::sort(r+i,r+i+3);
+            propbonus[propcnt++]=r[i+1];
+        }
+        std::sort(r,r+10);
+        propbonus[propcnt++]=154;
+        for(int i=3;i<7;++i)
+            propbonus[propcnt-1]+=r[i];
+        return;
+    }
+    void calcskill(){
+        unsigned char *a=namebonus+64,*b=namebase+64;
+        Rand rand(0,0,val);
+        for(int i=0;i<40;++i)
+            nameskill[i].init(i);
+        for(int s=0,i=0;i<2;++i){
+            for(int j=0;j<40;++j){
+                s=(s+rand(40)+nameskill[j].id)%40;
+                swap(nameskill[j].id,nameskill[s].id);
+            }
+        }
+        int last=-1;
+        for(int i=0,j=0;i<64;i+=4,++j){
+            unsigned char p=min({a[i],a[i+1],a[i+2],a[i+3]}),q=min({b[i],b[i+1],b[i+2],b[i+3]});
+            if(p>10){
+                if(nameskill[j].id<35)
+                    nameskill[j].freq=p-10;
+                if(q<=10)
+                    nameskill[j].e=true;
+                else if(nameskill[j].id<25)
+                    last=j;
+            }
+        }
+        if(last!=-1){
+            nameskill[last].e=true;
+            nameskill[last].freq*=2;
+        }
+        unsigned char u;
+        u=nameskill[14].freq;
+        if(u>0&&(!nameskill[14].e)){
+            nameskill[14].freq+=min({namebonus[60],namebonus[61],u});
+            nameskill[14].e=true;
+        }
+        u=nameskill[15].freq;
+        if(u>0&&(!nameskill[15].e)){
+            nameskill[15].freq+=min({namebonus[62],namebonus[63],u});
+            nameskill[15].e=true;
+        }
+        return;
     }
 };
 ```

@@ -56,6 +56,6 @@ abruce 超导体元素 涵虚 Shabby\_fish shenjack 曙光
 
 前几代旧版教程的编写者们，包括但不限于：<br>
 *（已包含在上方列表中的不再重复，按拼音字母排序）*<br>
-Graygoo Hell KODU 邱诺狼 神装天卫 学车
+Graygoo Hell KODU 零羽 邱诺狼 神装天卫 学车
 
 以及每一个续写名竞历史的你！

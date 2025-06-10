@@ -15,7 +15,7 @@ nav:
     - 7 二人组模型拟合配队: 'ex-chp7.md'
     - 8 简易算号原理: 'ex-chp8.md'
   - 拓展研究:
-    - 1 算号代码解析与优化[WIP]: 'deep-chp1.md'
+    - 1 算号代码解析与优化: 'deep-chp1.md'
     - 2 游戏机理与机制理解: 'deep-chp2.md'
   - 配套资源:
     - 资源文件下载: 'res-files.md'
@@ -24,6 +24,7 @@ nav:
     - 入门 Q&A: 'doc-qa-for-noobs.md'
     - Rinick 二人组: 'doc-rinick-duos.md'
     - 浅谈战队发展: 'doc-qtzdfz.md'
+    - 社区历史榜单与活动: 'doc-community.md'
     - MD5 大作战历史: 'doc-md5.md'
 theme:
   name: readthedocs
