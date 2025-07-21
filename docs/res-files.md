@@ -16,7 +16,7 @@
 
 如无法正常下载，可前往名竞 q 群获取。
 
-[node-openbox 开箱器](https://github.com/sqrt2802/namern-help/releases/download/file-downloader-init/node-openbox-250420.zip)
+[node-openbox 开箱器](https://github.com/sqrt2802/namern-help/releases/download/file-downloader-init/node-openbox-250721.zip)
 
 [Data\_Structure 配队器(Intel)](https://github.com/sqrt2802/namern-help/releases/download/file-downloader-init/Data_Structure_2_Intel.zip)
 
