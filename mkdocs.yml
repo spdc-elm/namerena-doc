@@ -17,6 +17,7 @@ nav:
   - 拓展研究:
     - 1 算号代码解析与优化: 'deep-chp1.md'
     - 2 游戏机理与机制理解: 'deep-chp2.md'
+    - 3 技能详解-文字版: 'chp_skills.md'
   - 配套资源:
     - 资源文件下载: 'res-files.md'
     - 算号代码获取: 'res-namecalc-code.md'
